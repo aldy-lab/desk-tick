@@ -3,6 +3,7 @@ name: tick
 on:
   schedule:
     - cron: "*/10 * * * *"
+    - cron: "7 3 * * *"
   workflow_dispatch:
 permissions:
   actions: write
@@ -18,7 +19,7 @@ jobs:
         run: curl -fsS --retry 2 --max-time 25 -H "x-tick-key: $KEY" "$URL" -o /dev/null -w "%{http_code}\n"
       # GitHub switches off schedules in a public repo with no activity for 60 days; re-enabling about once a day keeps it on
       - name: Keep the schedule on
-        if: github.event_name == 'schedule' && github.run_number % 144 == 0
+        if: github.event.schedule == '7 3 * * *'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/tick.yml/enable"
